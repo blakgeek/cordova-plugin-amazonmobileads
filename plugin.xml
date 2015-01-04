@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.0.0">
+    <name>Amazon Mobile Ads Plugin</name>
+    <description>Add support for Amazon Mobile Ads to your cordova based mobile apps.</description>
+    <license>Apache 2.0</license>
+    <keywords>amazon,mobile,ad,ads,blakgeek,sdk</keywords>
+    <author>Carlos Lawton</author>
+    <repo>https://github.com/blakgeek/cordova-plugin-amazonmobileads.git</repo>
+    <issue>https://github.com/blakgeek/cordova-plugin-amazonmobileads/issues</issue>
+
+    <js-module src="www/plugin.js" name="AmazonMobileAds">
+        <clobbers target="AmazonMobileAds" />
+    </js-module>
+    
+    <dependency id="com.google.playservices" />
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="AmazonMobileAdsPlugin">
+                <param name="ios-package" value="AmazonMobileAdsPlugin"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/AmazonMobileAdsPlugin.h" />
+        <source-file src="src/ios/AmazonMobileAdsPlugin.m" />
+        <framework src="src/ios/AmazonAd.framework" custom="true" />
+        <framework src="AdSupport.framework" />
+        <framework src="CoreLocation.framework" />
+        <framework src="SystemConfiguration.framework" />
+        <framework src="CoreTelephony.framework" />
+        <framework src="MediaPlayer.framework" />
+        <framework src="EventKit.framework" />
+        <framework src="EventKitUI.framework" />
+        <framework src="StoreKit.framework" />
+    </platform>
+    <platform name="android">
+        <config-file target="config.xml" parent="/*">
+            <feature name="AmazonMobileAdsPlugin">
+                <param name="android-package" value="com.blakgeek.cordova.plugin.amazonmobileads.AmazonMobileAdsPlugin"/>
+            </feature>
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity android:name="com.amazon.device.ads.AdActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+        </config-file>
+
+        <source-file src="src/android/AmazonMobileAdsPlugin.java" target-dir="src/com/blakgeek/cordova/plugin/amazonmobileads"/>
+        <source-file src="src/android/amazon-ads-5.4.235.jar" target-dir="libs" />
+    </platform>
+</plugin>
