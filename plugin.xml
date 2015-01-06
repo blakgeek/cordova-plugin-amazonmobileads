@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.0.0">
+        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.0.1">
     <name>Amazon Mobile Ads Plugin</name>
     <description>Cordova plugin for Amazon Mobile Ads.</description>
     <license>Apache 2.0</license>
