@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
         id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.0.0">
     <name>Amazon Mobile Ads Plugin</name>
-    <description>Add support for Amazon Mobile Ads to your cordova based mobile apps.</description>
+    <description>Cordova plugin for Amazon Mobile Ads.</description>
     <license>Apache 2.0</license>
     <keywords>amazon,mobile,ad,ads,blakgeek,sdk</keywords>
     <author>Carlos Lawton</author>
