@@ -15,6 +15,8 @@
 - (void) hideBannerAd: (CDVInvokedUrlCommand*)command;
 - (void) showInterstitialAd: (CDVInvokedUrlCommand*)command;
 
+@property (nonatomic) NSString* interstitialAdCallbackId;
+@property (nonatomic) NSString* bannerAdCallbackId;
 @property (nonatomic) CGRect bannerFrameTopLandscape;
 @property (nonatomic) CGRect bannerFrameBottomLandscape;
 @property (nonatomic) CGRect webViewFrameTopLandscape;

@@ -23,6 +23,8 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     private boolean bannerAtTop = false;
     private AdLayout bannerAdView = null;
     private InterstitialAd interstitialAd = null;
+    private CallbackEnabledInterstitialAdListener interstitialAdListener;
+    private CallbackEnabledAdListener bannerAdListener;
 
     @Override
     public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
@@ -41,85 +43,157 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 params.height = Math.round(AdSize.SIZE_320x50.getHeight() * density);
                 bannerAdView.setLayoutParams(params);
                 bannerAdView.setVisibility(View.VISIBLE);
+                bannerAdListener = new CallbackEnabledAdListener();
+                bannerAdView.setListener(bannerAdListener);
                 ViewGroup parent = (ViewGroup) AmazonMobileAdsPlugin.this.webView.getParent();
-                parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView));
+                parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView) + 1);
             }
         });
         // create interstitial
         interstitialAd = new InterstitialAd(cordova.getActivity());
-        interstitialAd.setListener(new DefaultAdListener() {
-            @Override
-            public void onAdFailedToLoad(Ad ad, AdError error) {
-                // call another ad network and make us some cash
-            }
-
-            @Override
-            public void onAdLoaded(Ad ad, AdProperties adProperties) {
-                AmazonMobileAdsPlugin.this.interstitialAd.showAd();
-            }
-
-            @Override
-            public void onAdDismissed(Ad ad) {
-                // callback to javascript so the game can continue
-            }
-        });
+        interstitialAdListener = new CallbackEnabledInterstitialAdListener(interstitialAd);
     }
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
             Log.i(LOGTAG, action);
+
             if (action.equals("setAppKey")) {
+
                 AdRegistration.setAppKey(args.getString(0));
+                callbackContext.success();
             } else if (action.equals("enableTestMode")) {
+
                 AdRegistration.enableTesting(args.getBoolean(0));
+                callbackContext.success();
             } else if (action.equals("enableLogging")) {
+
                 AdRegistration.enableLogging(args.getBoolean(0));
+                callbackContext.success();
             } else if (action.equals("showBannerAd")) {
-                onShowBannerAd(args.getBoolean(0));
+
+                showBannerAd(args, callbackContext);
             } else if (action.equals("hideBannerAd")) {
-                onHideBannerAd();
+
+                hideBannerAd(callbackContext);
             } else if (action.equals("showInterstitialAd")) {
-                interstitialAd.loadAd();
+
+                showInterstitialAd(callbackContext);
+            } else {
+
+                callbackContext.error("Unknown Action");
+                return false;
             }
-            callbackContext.success("");
             return true;
         } catch (JSONException e) {
+
             Log.e("AmazonMobileAdsPlugin", e.getMessage());
             callbackContext.error("AmazonMobileAdsPlugin: " + e.getMessage());
             return false;
         }
     }
 
-    private void onHideBannerAd() {
+    private void showInterstitialAd(CallbackContext callbackContext) {
+        interstitialAdListener.setCallbackContext(callbackContext);
+        if(!interstitialAd.loadAd()) {
+            callbackContext.error("Unable to load interstitial ad");
+        }
+    }
+
+    private void hideBannerAd(final CallbackContext callbackContext) {
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(bannerAdView.getVisibility() == View.VISIBLE) {
+                if (bannerAdView.getVisibility() == View.VISIBLE) {
                     bannerAdView.setVisibility(View.GONE);
                 }
+                callbackContext.success();
             }
         });
     }
 
-    protected void onShowBannerAd(final boolean showAtTop) throws JSONException {
+    protected void showBannerAd(JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-        bannerAdView.loadAd();
+        final boolean showAtTop = args.getBoolean(0);
+        bannerAdListener.setCallbackContext(callbackContext);
+        if(bannerAdView.loadAd()) {
 
-        cordova.getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if(showAtTop != bannerAtTop) {
-                    bannerAtTop = showAtTop;
-                    ViewGroup parent = (ViewGroup) webView.getParent();
-                    parent.removeView(bannerAdView);
-                    parent.addView(bannerAdView, bannerAtTop ? 0 : 1);
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (showAtTop != bannerAtTop) {
+                        bannerAtTop = showAtTop;
+                        ViewGroup parent = (ViewGroup) webView.getParent();
+                        parent.removeView(bannerAdView);
+                        parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView) + 1);
+                    }
+
+                    if (bannerAdView.getVisibility() != View.VISIBLE) {
+                        bannerAdView.setVisibility(View.VISIBLE);
+                    }
                 }
+            });
+        } else {
+            callbackContext.error("Unable to banner ad");
+        }
+    }
 
-                if(bannerAdView.getVisibility() != View.VISIBLE) {
-                    bannerAdView.setVisibility(View.VISIBLE);
-                }
+    private class CallbackEnabledInterstitialAdListener extends DefaultAdListener {
+
+        CallbackContext callbackContext;
+        InterstitialAd interstitialAd;
+
+        public CallbackEnabledInterstitialAdListener(InterstitialAd interstitialAd) {
+
+            this.interstitialAd = interstitialAd;
+            this.interstitialAd.setListener(this);
+        }
+
+        public void setCallbackContext(CallbackContext callbackContext) {
+            if (this.callbackContext != null && !this.callbackContext.isFinished()) {
+                callbackContext.error("Too slow.  Your request got stomped on by a newer one");
             }
-        });
+            this.callbackContext = callbackContext;
+        }
+
+        @Override
+        public void onAdLoaded(Ad ad, AdProperties adProperties) {
+
+            interstitialAd.showAd();
+            callbackContext.success();
+        }
+
+        @Override
+        public void onAdFailedToLoad(Ad ad, AdError error) {
+
+            callbackContext.error(error.getMessage());
+        }
+
+    }
+
+    private class CallbackEnabledAdListener extends DefaultAdListener {
+
+        CallbackContext callbackContext;
+
+        public void setCallbackContext(CallbackContext callbackContext) {
+            if (this.callbackContext != null && !this.callbackContext.isFinished()) {
+                callbackContext.error("Too slow.  Your request got stomped on by a newer one");
+            }
+            this.callbackContext = callbackContext;
+        }
+
+        @Override
+        public void onAdLoaded(Ad ad, AdProperties adProperties) {
+
+            callbackContext.success();
+        }
+
+        @Override
+        public void onAdFailedToLoad(Ad ad, AdError error) {
+
+            callbackContext.error(error.getMessage());
+        }
+
     }
 }

@@ -15,6 +15,65 @@
 
 @implementation AmazonMobileAdsPlugin
 
+#pragma mark - AmazonMobileAdsPlugin
+
+- (void)setAppKey:(CDVInvokedUrlCommand *)command {
+
+    NSString *appKey = [command argumentAtIndex:0];
+    [[AmazonAdRegistration sharedRegistration] setAppKey:appKey];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)showInterstitialAd:(CDVInvokedUrlCommand *)command {
+
+    self.interstitialAdCallbackId = command.callbackId;
+    AmazonAdOptions *options = [AmazonAdOptions options];
+    options.isTestRequest = self.testMode;
+    [self.interstitial load:options];
+}
+
+- (void)showBannerAd:(CDVInvokedUrlCommand *)command {
+
+    self.bannerAdCallbackId = command.callbackId;
+    self.bannerAtTop = [[command argumentAtIndex:0 withDefault:@"NO"] boolValue];
+    [self updateViewFrames];
+    self.webView.frame = self.webViewFrame;
+    self.amazonAdView.frame = self.bannerFrame;
+    self.amazonAdView.hidden = NO;
+
+    AmazonAdOptions *options = [AmazonAdOptions options];
+    options.isTestRequest = self.testMode;
+    self.amazonAdView is
+    [self.amazonAdView loadAd:options];
+
+}
+
+- (void)hideBannerAd:(CDVInvokedUrlCommand *)command {
+
+    self.webView.frame = self.webView.superview.frame;
+    self.amazonAdView.hidden = YES;
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)enableTestMode:(CDVInvokedUrlCommand *)command {
+    self.testMode = [[command argumentAtIndex:0 withDefault:@"YES"] boolValue];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)enableLogging:(CDVInvokedUrlCommand *)command {
+
+    BOOL isEnabled = [[command argumentAtIndex:0 withDefault:@"YES"] boolValue];
+    [[AmazonAdRegistration sharedRegistration] setLogging:isEnabled];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+
+#pragma mark - CDVPlugin
+
 - (void)pluginInitialize {
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     [[NSNotificationCenter defaultCenter]
@@ -23,7 +82,7 @@
                    name:UIDeviceOrientationDidChangeNotification
                  object:nil];
 
-    
+
     CGSize bannerSize = AmazonAdSize_320x50;
 
 //    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
@@ -71,6 +130,8 @@
     [self updateViewFrames];
 }
 
+#pragma mark - internal stuff
+
 - (void)deviceOrientationChange:(NSNotification *)notification {
 
     [self updateViewFrames];
@@ -107,49 +168,6 @@
     }
 }
 
-- (void)setAppKey:(CDVInvokedUrlCommand *)command {
-
-    NSString *appKey = [command argumentAtIndex:0];
-    [[AmazonAdRegistration sharedRegistration] setAppKey:appKey];
-}
-
-- (void)showInterstitialAd:(CDVInvokedUrlCommand *)command {
-
-    AmazonAdOptions *options = [AmazonAdOptions options];
-    options.isTestRequest = self.testMode;
-    [self.interstitial load:options];
-}
-
-- (void)showBannerAd:(CDVInvokedUrlCommand *)command {
-
-    self.bannerAtTop = [[command argumentAtIndex:0 withDefault:@"NO"] boolValue];
-    [self updateViewFrames];
-    self.webView.frame = self.webViewFrame;
-    self.amazonAdView.frame = self.bannerFrame;
-    self.amazonAdView.hidden = NO;
-
-    AmazonAdOptions *options = [AmazonAdOptions options];
-    options.isTestRequest = self.testMode;
-    [self.amazonAdView loadAd:options];
-
-}
-
-- (void)hideBannerAd:(CDVInvokedUrlCommand *)command {
-
-    self.webView.frame = self.webView.superview.frame;
-    self.amazonAdView.hidden = YES;
-}
-
-- (void)enableTestMode:(CDVInvokedUrlCommand *)command {
-    self.testMode = [[command argumentAtIndex:0 withDefault:@"YES"] boolValue];
-}
-
-- (void)enableLogging:(CDVInvokedUrlCommand *)command {
-
-    BOOL isEnabled = [[command argumentAtIndex:0 withDefault:@"YES"] boolValue];
-    [[AmazonAdRegistration sharedRegistration] setLogging:isEnabled];
-}
-
 #pragma mark AmazonAdViewDelegate
 
 // @required
@@ -170,11 +188,15 @@
 // @optional
 - (void)adViewDidLoad:(AmazonAdView *)view {
     NSLog(@"Successfully loaded an ad");
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId: self.bannerAdCallbackId];
 }
 
 // @optional
 - (void)adViewDidFailToLoad:(AmazonAdView *)view withError:(AmazonAdError *)error {
-    NSLog(@"Ad Failed to load. Error code %d: %@", error.errorCode, error.errorDescription);
+    NSLog(@"Banner Ad Failed to load. Error code %d: %@ %@", error.errorCode, error.errorDescription, error.debugDescription);
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.errorDescription];
+    [self.commandDelegate sendPluginResult:result callbackId: self.bannerAdCallbackId ];
 }
 
 
@@ -186,7 +208,9 @@
 }
 
 - (void)interstitialDidFailToLoad:(AmazonAdInterstitial *)interstitial withError:(AmazonAdError *)error {
-    NSLog(@"Interstitial failed to load.");
+    NSLog(@"Interstitial Ad Failed to load. Error code %d: %@ %@", error.errorCode, error.errorDescription, error.debugDescription);
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString: error.errorDescription];
+    [self.commandDelegate sendPluginResult:result callbackId: self.interstitialAdCallbackId];
 }
 
 - (void)interstitialWillPresent:(AmazonAdInterstitial *)interstitial {
@@ -195,6 +219,8 @@
 
 - (void)interstitialDidPresent:(AmazonAdInterstitial *)interstitial {
     NSLog(@"Interstitial has been presented.");
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId: self.interstitialAdCallbackId];
 }
 
 - (void)interstitialWillDismiss:(AmazonAdInterstitial *)interstitial {
