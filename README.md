@@ -3,15 +3,19 @@ Add support for Amazon Mobile Ads to your cordova based mobile apps.
 
 ## How do I install it? ##
 
-* If you're like me and using [Cordova CLI](http://cordova.apache.org/):
+* If you're like me and using [CLI](http://cordova.apache.org/):
 ```
-cordova plugin add com.blakgeek.cordova.plugin.amazonmobileads
+cordova plugin add https://github.com/blakgeek/cordova-plugin-amazonmobileads
 ```
 
-* If you're using [PhoneGap Buid](http://build.phonegap.com/):
-```javascript
-<gap:plugin name="com.blakgeek.cordova.plugin.amazonmobileads" source="plugins.cordova.io"/>
+or
 
+```
+phonegap local plugin add https://github.com/blakgeek/cordova-plugin-amazonmobileads
+```
+
+## WARNING: iOS Cordova Registry
+****Installing this plugin directly from Cordova Registry results in Xcode using a broken `AmazonAd.framework`, this is because the current publish procedure to NPM breaks symlinks [CB-6092](https://issues.apache.org/jira/browse/CB-6092). Please install the plugin through through the github url or re-add the `AmazonAd.framework` manually.****
 
 ## How do I use it? ##
 TODO: Add documentation

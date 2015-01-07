@@ -25,7 +25,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     private InterstitialAd interstitialAd = null;
 
     @Override
-    public void initialize(CordovaInterface cordova, CordovaWebView webView) {
+    public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
         super.initialize(cordova, webView);
 
         // create banner view
@@ -42,7 +42,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 bannerAdView.setLayoutParams(params);
                 bannerAdView.setVisibility(View.VISIBLE);
                 ViewGroup parent = (ViewGroup) AmazonMobileAdsPlugin.this.webView.getParent();
-                parent.addView(bannerAdView, bannerAtTop ? 0 : 1);
+                parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView));
             }
         });
         // create interstitial
@@ -102,16 +102,15 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
         });
     }
 
-    protected void onShowBannerAd(boolean showAtTop) throws JSONException {
+    protected void onShowBannerAd(final boolean showAtTop) throws JSONException {
 
-        final boolean positionChanged = showAtTop != bannerAtTop;
-        bannerAtTop = showAtTop;
         bannerAdView.loadAd();
 
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(positionChanged) {
+                if(showAtTop != bannerAtTop) {
+                    bannerAtTop = showAtTop;
                     ViewGroup parent = (ViewGroup) webView.getParent();
                     parent.removeView(bannerAdView);
                     parent.addView(bannerAdView, bannerAtTop ? 0 : 1);
@@ -123,6 +122,4 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             }
         });
     }
-
-
 }
