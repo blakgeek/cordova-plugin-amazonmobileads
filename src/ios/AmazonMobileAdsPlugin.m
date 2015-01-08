@@ -44,7 +44,6 @@
 
     AmazonAdOptions *options = [AmazonAdOptions options];
     options.isTestRequest = self.testMode;
-    self.amazonAdView is
     [self.amazonAdView loadAd:options];
 
 }
