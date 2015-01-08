@@ -16,12 +16,20 @@ function AmazonMobileAds() {
  		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'showInterstitialAd', []);
    	};
 
-	this.enableLogging = function(isEnabled, successCallback, failureCallback) {
-		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableLogging', [isEnabled !== false]);
+	this.enableLogging = function(successCallback, failureCallback) {
+		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableLogging', [true]);
 	};
 
-	this.enableTestMode = function(isEnabled, successCallback, failureCallback) {
-		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableTestMode', [isEnabled !== false]);
+	this.disableLogging = function(successCallback, failureCallback) {
+		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableLogging', [false]);
+	};
+
+	this.enableTestMode = function(successCallback, failureCallback) {
+		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableTestMode', [true]);
+	};
+
+	this.disableTestMode = function(successCallback, failureCallback) {
+		cordova.exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableTestMode', [false]);
 	};
 }
 
