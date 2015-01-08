@@ -46,7 +46,7 @@ document.addEventListener('deviceready', function() {
 	});
 
 	// hide the banner but the keep the where it was occupied
-	amazonads.hideBannerAd(true, function() {
+	amazonads.hideBannerAd(false, function() {
 		console.log('now you see me now you do not');
 	}, function(err) {
 		console.error(['oh crap', err]);
