@@ -25,7 +25,7 @@ document.addEventListener('deviceready', function() {
 	window.amazonads = new AmazonMobileAds();
 
 	// get things started by passing in your app key
-	amazonads.init('<you app key>', function() {
+	amazonads.init('<your app key>', function() {
 		console.log('super dope it worked');
 	}, function(err) {
 		console.error(['oh crap', err]);
