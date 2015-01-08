@@ -11,7 +11,7 @@
 
     <js-module src="www/plugin.js" name="AmazonMobileAds">
         <clobbers target="AmazonMobileAds" />
-        <clobbers target="window.smoothie.amazon" />
+        <clobbers target="smoothie.amazon" />
     </js-module>
     
     <dependency id="com.google.playservices" />
