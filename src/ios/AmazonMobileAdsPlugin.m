@@ -37,9 +37,12 @@
 
     self.bannerAdCallbackId = command.callbackId;
     self.bannerAtTop = [[command argumentAtIndex:0 withDefault:@"NO"] boolValue];
+    BOOL createBannerSpace = [[command argumentAtIndex:1 withDefault:@"YES"] boolValue];
     [self updateViewFrames];
-    self.webView.frame = self.webViewFrame;
     self.amazonAdView.frame = self.bannerFrame;
+    if(createBannerSpace) {
+        self.webView.frame = self.webViewFrame;
+    }
     self.amazonAdView.hidden = NO;
 
     AmazonAdOptions *options = [AmazonAdOptions options];
@@ -50,10 +53,23 @@
 
 - (void)hideBannerAd:(CDVInvokedUrlCommand *)command {
 
-    self.webView.frame = self.webView.superview.frame;
+    BOOL releaseBannerSpace = [[command argumentAtIndex:0 withDefault:@"YES"] boolValue];
+    if(releaseBannerSpace) {
+        self.webView.frame = self.webView.superview.frame;
+    }
     self.amazonAdView.hidden = YES;
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void)claimBannerAdSpace:(CDVInvokedUrlCommand *)command {
+
+    self.bannerAtTop = [[command argumentAtIndex:0 withDefault:@"NO"] boolValue];
+    [self updateViewFrames];
+    self.webView.frame = self.webViewFrame;
+}
+
+- (void)releaseBannerAdSpace:(CDVInvokedUrlCommand *)command {
+
+    self.webView.frame = self.webView.superview.frame;
 }
 
 - (void)enableTestMode:(CDVInvokedUrlCommand *)command {
@@ -135,7 +151,7 @@
 
     [self updateViewFrames];
 
-    if (self.amazonAdView.isHidden == NO) {
+    if (!self.amazonAdView.isHidden) {
         self.webView.frame = self.webViewFrame;
         self.amazonAdView.frame = self.bannerFrame;
     }

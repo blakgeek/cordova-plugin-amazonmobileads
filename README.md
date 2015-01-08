@@ -31,26 +31,44 @@ document.addEventListener('deviceready', function() {
 		console.error(['oh crap', err]);
 	});
 
-	// show a banner at the top the screen (if no arguments is passed it will default showing at the bottom)
-	amazonads.showBannerAd(true, function() {
-		console.log('oh snap I got a banner at the bottom');
+	// show a banner at the top the screen and resize the webview to make space for it
+	amazonads.showBannerAd(true, true, function() {
+		console.log('oh snap I got a banner at the top');
 	}, function(err) {
 		console.error(['oh crap', err]);
 	});
 
-	// show a banner at the bottom of the screen
-	amazonads.showBannerAd(false, function() {
+	// show a banner at the bottom of the screen and overlay the webview.  overlaying is useful if the space the banner has already been accounted for
+	amazonads.showBannerAd(false, false, function() {
 		console.log('what what see the banner at the bottom');
 	}, function(err) {
 		console.error(['oh crap', err]);
 	});
 
-	// hide the banner
-	amazonads.hideBannerAd(function() {
+	// hide the banner but the keep the where it was occupied
+	amazonads.hideBannerAd(true, function() {
 		console.log('now you see me now you do not');
 	}, function(err) {
 		console.error(['oh crap', err]);
 	});
+
+	// hide the banner and release the space that it occupied
+	amazonads.hideBannerAd(true, function() {
+		console.log('now you see me now you do not');
+	}, function(err) {
+		console.error(['oh crap', err]);
+	});
+	
+	// make space at the top of the screen for a banner that will be displayed later
+	// this will resize the webview
+    amazonads.claimBannerAdSpace(true);
+
+	// make space at the bottom of the screen for a banenr that will be displayed later.
+	// if not argument is passed it will default to making the space at the bottom
+	amazonads.claimBannerAdSpace(false);
+
+    // release the space occupied the banner
+    amazonads.releaseBannerAdSpace();	
 
 	// show and interstitial
 	amazonads.showInterstitialAd(function() {
