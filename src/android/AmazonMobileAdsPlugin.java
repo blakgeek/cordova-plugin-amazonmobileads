@@ -80,6 +80,13 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             } else if (action.equals("showInterstitialAd")) {
 
                 showInterstitialAd(callbackContext);
+            } else if ("claimBannerAdSpace".equals(action)) {
+
+                // TODO: implement code to claim space
+
+            } else if("releaseBannerAdSpace".equals(action)) {
+
+                // TODO: implement code to release space
             } else {
 
                 callbackContext.error("Unknown Action");
