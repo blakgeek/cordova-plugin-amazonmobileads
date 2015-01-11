@@ -1,15 +1,13 @@
 package com.blakgeek.cordova.plugin.amazonmobileads;
 
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import com.amazon.device.ads.*;
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -25,30 +23,29 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     private InterstitialAd interstitialAd = null;
     private CallbackEnabledInterstitialAdListener interstitialAdListener;
     private CallbackEnabledAdListener bannerAdListener;
+    private ViewGroup blender;
+    private ViewGroup webViewContainer;
 
     @Override
-    public void initialize(CordovaInterface cordova, final CordovaWebView webView) {
-        super.initialize(cordova, webView);
+    protected void pluginInitialize() {
+
+        // look for the smoothie parent view
+        webViewContainer = (ViewGroup) webView.getParent();
+        bannerAdView = new AdLayout(AmazonMobileAdsPlugin.this.cordova.getActivity(), AdSize.SIZE_320x50);
+//        bannerAdView.setVisibility(View.INVISIBLE);
+        bannerAdListener = new CallbackEnabledAdListener();
+        bannerAdView.setListener(bannerAdListener);
 
         // create banner view
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                bannerAdView = new AdLayout(AmazonMobileAdsPlugin.this.cordova.getActivity(), AdSize.SIZE_320x50);
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                params.gravity = bannerAtTop ? Gravity.TOP : Gravity.BOTTOM;
-                // explicitly set the height so that it doesn't flash when reloading
-                // multiply by the density to ensure that doesn't appear too small on the device
-                float density = AmazonMobileAdsPlugin.this.cordova.getActivity().getResources().getDisplayMetrics().density;
-                params.height = Math.round(AdSize.SIZE_320x50.getHeight() * density);
-                bannerAdView.setLayoutParams(params);
-                bannerAdView.setVisibility(View.VISIBLE);
-                bannerAdListener = new CallbackEnabledAdListener();
-                bannerAdView.setListener(bannerAdListener);
-                ViewGroup parent = (ViewGroup) AmazonMobileAdsPlugin.this.webView.getParent();
-                parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView) + 1);
+
+                initializedSmoothieCup();
+                blender.addView(bannerAdView);
             }
         });
+
         // create interstitial
         interstitialAd = new InterstitialAd(cordova.getActivity());
         interstitialAdListener = new CallbackEnabledInterstitialAdListener(interstitialAd);
@@ -76,7 +73,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 showBannerAd(args, callbackContext);
             } else if (action.equals("hideBannerAd")) {
 
-                hideBannerAd(callbackContext);
+                hideBannerAd(args, callbackContext);
             } else if (action.equals("showInterstitialAd")) {
 
                 showInterstitialAd(callbackContext);
@@ -84,7 +81,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
 
                 // TODO: implement code to claim space
 
-            } else if("releaseBannerAdSpace".equals(action)) {
+            } else if ("releaseBannerAdSpace".equals(action)) {
 
                 // TODO: implement code to release space
             } else {
@@ -103,18 +100,24 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
 
     private void showInterstitialAd(CallbackContext callbackContext) {
         interstitialAdListener.setCallbackContext(callbackContext);
-        if(!interstitialAd.loadAd()) {
+        if (!interstitialAd.loadAd()) {
             callbackContext.error("Unable to load interstitial ad");
         }
     }
 
-    private void hideBannerAd(final CallbackContext callbackContext) {
+    private void hideBannerAd(JSONArray args, final CallbackContext callbackContext) throws JSONException {
+
+        final boolean releaseAdSpace = args.getBoolean(0);
+
         cordova.getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (bannerAdView.getVisibility() == View.VISIBLE) {
-                    bannerAdView.setVisibility(View.GONE);
+
+                if (releaseAdSpace) {
+                    blender.setVisibility(View.GONE);
                 }
+                //bannerAdView.setVisibility(View.INVISIBLE);
+
                 callbackContext.success();
             }
         });
@@ -123,26 +126,43 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     protected void showBannerAd(JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         final boolean showAtTop = args.getBoolean(0);
+        // TODO: figure out how to not
+        final boolean claimAdSpace = args.getBoolean(1);
+
         bannerAdListener.setCallbackContext(callbackContext);
-        if(bannerAdView.loadAd()) {
+        if (bannerAdView.loadAd()) {
 
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     if (showAtTop != bannerAtTop) {
                         bannerAtTop = showAtTop;
-                        ViewGroup parent = (ViewGroup) webView.getParent();
-                        parent.removeView(bannerAdView);
-                        parent.addView(bannerAdView, bannerAtTop ? 0 : parent.indexOfChild(webView) + 1);
+                        webViewContainer.removeView(blender);
+                        webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
                     }
 
-                    if (bannerAdView.getVisibility() != View.VISIBLE) {
-                        bannerAdView.setVisibility(View.VISIBLE);
-                    }
+                    blender.setVisibility(View.VISIBLE);
+                    //bannerAdView.setVisibility(View.VISIBLE);
+                    bannerAdView.bringToFront();
                 }
             });
         } else {
             callbackContext.error("Unable to banner ad");
+        }
+    }
+
+
+    private void initializedSmoothieCup() {
+        blender = (ViewGroup) webViewContainer.findViewWithTag("SMOOTHIE_BLENDER");
+        if (blender == null) {
+            blender = new FrameLayout(cordova.getActivity());
+            blender.setTag("SMOOTHIE_BLENDER");
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            float density = cordova.getActivity().getResources().getDisplayMetrics().density;
+            params.height = Math.round(50 * density);
+            blender.setLayoutParams(params);
+            blender.setVisibility(View.GONE);
+            webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
         }
     }
 
