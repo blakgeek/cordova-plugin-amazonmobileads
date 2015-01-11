@@ -18,7 +18,7 @@ import org.json.JSONException;
 public class AmazonMobileAdsPlugin extends CordovaPlugin {
 
     private static final String LOGTAG = "AmazonMobileAdsPlugin";
-    private boolean bannerAtTop = false;
+    private boolean bannerAtTop = true;
     private AdLayout bannerAdView = null;
     private InterstitialAd interstitialAd = null;
     private CallbackEnabledInterstitialAdListener interstitialAdListener;
@@ -32,7 +32,6 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
         // look for the smoothie parent view
         webViewContainer = (ViewGroup) webView.getParent();
         bannerAdView = new AdLayout(AmazonMobileAdsPlugin.this.cordova.getActivity(), AdSize.SIZE_320x50);
-//        bannerAdView.setVisibility(View.INVISIBLE);
         bannerAdListener = new CallbackEnabledAdListener();
         bannerAdView.setListener(bannerAdListener);
 
@@ -41,7 +40,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             @Override
             public void run() {
 
-                initializedSmoothieCup();
+                plugInBlender();
                 blender.addView(bannerAdView);
             }
         });
@@ -116,7 +115,6 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 if (releaseAdSpace) {
                     blender.setVisibility(View.GONE);
                 }
-                //bannerAdView.setVisibility(View.INVISIBLE);
 
                 callbackContext.success();
             }
@@ -126,33 +124,29 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     protected void showBannerAd(JSONArray args, CallbackContext callbackContext) throws JSONException {
 
         final boolean showAtTop = args.getBoolean(0);
-        // TODO: figure out how to not
+        // TODO: figure out how to claim and not claim space
         final boolean claimAdSpace = args.getBoolean(1);
 
-        bannerAdListener.setCallbackContext(callbackContext);
-        if (bannerAdView.loadAd()) {
-
-            cordova.getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (showAtTop != bannerAtTop) {
-                        bannerAtTop = showAtTop;
-                        webViewContainer.removeView(blender);
-                        webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
-                    }
-
-                    blender.setVisibility(View.VISIBLE);
-                    //bannerAdView.setVisibility(View.VISIBLE);
-                    bannerAdView.bringToFront();
+        cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (showAtTop != bannerAtTop) {
+                    bannerAtTop = showAtTop;
+                    webViewContainer.removeView(blender);
+                    webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
                 }
-            });
-        } else {
-            callbackContext.error("Unable to banner ad");
+
+                blender.setVisibility(View.VISIBLE);
+            }
+        });
+
+        bannerAdListener.setCallbackContext(callbackContext);
+        if (!bannerAdView.loadAd()) {
+            callbackContext.error("Unable to load banner ad");
         }
     }
 
-
-    private void initializedSmoothieCup() {
+    private void plugInBlender() {
         blender = (ViewGroup) webViewContainer.findViewWithTag("SMOOTHIE_BLENDER");
         if (blender == null) {
             blender = new FrameLayout(cordova.getActivity());
@@ -212,7 +206,12 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
 
         @Override
         public void onAdLoaded(Ad ad, AdProperties adProperties) {
-
+            cordova.getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    bannerAdView.bringToFront();
+                }
+            });
             callbackContext.success();
         }
 
