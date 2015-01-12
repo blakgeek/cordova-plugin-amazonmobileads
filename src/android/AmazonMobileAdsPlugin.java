@@ -41,6 +41,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             public void run() {
 
                 plugInBlender();
+                bannerAdView.setVisibility(View.INVISIBLE);
                 blender.addView(bannerAdView);
             }
         });
@@ -115,7 +116,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 if (releaseAdSpace) {
                     blender.setVisibility(View.GONE);
                 }
-
+                bannerAdView.setVisibility(View.INVISIBLE);
                 callbackContext.success();
             }
         });
@@ -209,6 +210,8 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+
+                    bannerAdView.setVisibility(View.VISIBLE);
                     bannerAdView.bringToFront();
                 }
             });
