@@ -17,7 +17,7 @@ import org.json.JSONException;
 
 public class AmazonMobileAdsPlugin extends CordovaPlugin {
 
-    private static final String LOGTAG = "AmazonMobileAdsPlugin";
+    private static final String LOGTAG = "[AmazonMobileAdsPlugin]";
     private boolean bannerAtTop = true;
     private AdLayout bannerAdView = null;
     private InterstitialAd interstitialAd = null;
@@ -152,7 +152,7 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
         if (blender == null) {
             blender = new FrameLayout(cordova.getActivity());
             blender.setTag("SMOOTHIE_BLENDER");
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
             float density = cordova.getActivity().getResources().getDisplayMetrics().density;
             params.height = Math.round(50 * density);
             blender.setLayoutParams(params);
