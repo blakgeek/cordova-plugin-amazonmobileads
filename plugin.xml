@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.0.21">
+        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.1.0">
     <name>Amazon Mobile Ads Plugin</name>
     <description>Cordova plugin for Amazon Mobile Ads.</description>
     <license>Apache 2.0</license>
@@ -50,6 +50,6 @@
         </config-file>
 
         <source-file src="src/android/AmazonMobileAdsPlugin.java" target-dir="src/com/blakgeek/cordova/plugin/amazonmobileads"/>
-        <source-file src="src/android/amazon-ads-5.4.235.jar" target-dir="libs" />
+        <source-file src="src/android/amazon-ads-5.6.20.jar" target-dir="libs" />
     </platform>
 </plugin>

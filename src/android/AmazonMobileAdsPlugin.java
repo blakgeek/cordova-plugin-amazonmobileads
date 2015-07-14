@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import com.amazon.device.ads.*;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -24,11 +25,17 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     private CallbackEnabledAdListener bannerAdListener;
     private ViewGroup blender;
     private ViewGroup webViewContainer;
+    private View webView;
 
     @Override
     protected void pluginInitialize() {
 
         // look for the smoothie parent view
+        if(super.webView instanceof View) {
+            webView = (View) super.webView;
+        } else {
+            webView = (View) super.webView.getView().getParent();
+        }
         webViewContainer = (ViewGroup) webView.getParent();
         bannerAdView = new AdLayout(AmazonMobileAdsPlugin.this.cordova.getActivity(), AdSize.SIZE_320x50);
         bannerAdListener = new CallbackEnabledAdListener();
@@ -133,7 +140,8 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
                 if (showAtTop != bannerAtTop) {
                     bannerAtTop = showAtTop;
                     webViewContainer.removeView(blender);
-                    webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
+                    webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.getChildCount());
+
                 }
 
                 blender.setVisibility(View.VISIBLE);
@@ -149,6 +157,11 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
     private void plugInBlender() {
         blender = (ViewGroup) webViewContainer.findViewWithTag("SMOOTHIE_BLENDER");
         if (blender == null) {
+
+            // make the webView stretchy
+            webView.setLayoutParams(new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT, 1f));
+
             blender = new FrameLayout(cordova.getActivity());
             blender.setTag("SMOOTHIE_BLENDER");
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
@@ -156,7 +169,8 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
             params.height = Math.round(50 * density);
             blender.setLayoutParams(params);
             blender.setVisibility(View.GONE);
-            webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.indexOfChild(webView) + 1);
+
+            webViewContainer.addView(blender, bannerAtTop ? 0 : webViewContainer.getChildCount());
         }
     }
 
