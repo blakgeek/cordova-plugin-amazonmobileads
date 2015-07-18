@@ -1,6 +1,7 @@
 package com.blakgeek.cordova.plugin.amazonmobileads;
 
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -38,6 +39,10 @@ public class AmazonMobileAdsPlugin extends CordovaPlugin {
         }
         webViewContainer = (ViewGroup) webView.getParent();
         bannerAdView = new AdLayout(AmazonMobileAdsPlugin.this.cordova.getActivity(), AdSize.SIZE_320x50);
+        float scale = this.cordova.getActivity().getApplicationContext().getResources().getDisplayMetrics().density;
+        bannerAdView.setLayoutParams(new FrameLayout.LayoutParams(
+            (int) (320 * scale),(int) (50 * scale),
+            Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL));
         bannerAdListener = new CallbackEnabledAdListener();
         bannerAdView.setListener(bannerAdListener);
 
