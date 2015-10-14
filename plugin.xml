@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-        id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.1.0">
+<plugin id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.1.1"
+    xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Amazon Mobile Ads Plugin</name>
     <description>Cordova plugin for Amazon Mobile Ads.</description>
     <license>Apache 2.0</license>
@@ -13,13 +13,16 @@
         <clobbers target="AmazonMobileAds" />
         <clobbers target="smoothieServices.amazon" />
     </js-module>
-    
-    <dependency id="com.google.playservices" />
+
+    <engines>
+        <engine name="cordova-android" version=">=4.0.0" />
+        <engine name="cordova-plugman" version=">=4.2.0" />
+    </engines>
 
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="AmazonMobileAdsPlugin">
-                <param name="ios-package" value="AmazonMobileAdsPlugin"/>
+                <param name="ios-package" value="AmazonMobileAdsPlugin" />
             </feature>
         </config-file>
         <header-file src="src/ios/AmazonMobileAdsPlugin.h" />
@@ -37,11 +40,13 @@
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="AmazonMobileAdsPlugin">
-                <param name="android-package" value="com.blakgeek.cordova.plugin.amazonmobileads.AmazonMobileAdsPlugin"/>
+                <param name="android-package"
+                    value="com.blakgeek.cordova.plugin.amazonmobileads.AmazonMobileAdsPlugin" />
             </feature>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:name="com.amazon.device.ads.AdActivity" android:configChanges="keyboardHidden|orientation|screenSize"/>
+            <activity android:name="com.amazon.device.ads.AdActivity"
+                android:configChanges="keyboardHidden|orientation|screenSize" />
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.INTERNET" />
@@ -49,7 +54,9 @@
             <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
         </config-file>
 
-        <source-file src="src/android/AmazonMobileAdsPlugin.java" target-dir="src/com/blakgeek/cordova/plugin/amazonmobileads"/>
+        <source-file src="src/android/AmazonMobileAdsPlugin.java"
+            target-dir="src/com/blakgeek/cordova/plugin/amazonmobileads" />
         <source-file src="src/android/amazon-ads-5.6.20.jar" target-dir="libs" />
+        <framework src="com.google.android.gms:play-services-ads:+" />
     </platform>
 </plugin>
