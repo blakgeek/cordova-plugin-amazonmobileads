@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="com.blakgeek.cordova.plugin.amazonmobileads" version="1.1.1"
+<plugin id="cordova-plugin-amazonmobileads" version="2.0.0"
     xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Amazon Mobile Ads Plugin</name>
     <description>Cordova plugin for Amazon Mobile Ads.</description>
@@ -9,7 +9,7 @@
     <repo>https://github.com/blakgeek/cordova-plugin-amazonmobileads.git</repo>
     <issue>https://github.com/blakgeek/cordova-plugin-amazonmobileads/issues</issue>
 
-    <js-module src="www/plugin.js" name="AmazonMobileAds">
+    <js-module src="www/AmazonMobileAdsPlugin.js" name="AmazonMobileAds">
         <clobbers target="AmazonMobileAds" />
         <clobbers target="smoothieServices.amazon" />
     </js-module>
@@ -19,6 +19,8 @@
         <engine name="cordova-plugman" version=">=4.2.0" />
     </engines>
 
+    <dependency id="cordova-plugin-cocoapod-support"/>
+
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
             <feature name="AmazonMobileAdsPlugin">
@@ -27,15 +29,7 @@
         </config-file>
         <header-file src="src/ios/AmazonMobileAdsPlugin.h" />
         <source-file src="src/ios/AmazonMobileAdsPlugin.m" />
-        <framework src="src/ios/AmazonAd.framework" custom="true" />
-        <framework src="AdSupport.framework" />
-        <framework src="CoreLocation.framework" />
-        <framework src="SystemConfiguration.framework" />
-        <framework src="CoreTelephony.framework" />
-        <framework src="MediaPlayer.framework" />
-        <framework src="EventKit.framework" />
-        <framework src="EventKitUI.framework" />
-        <framework src="StoreKit.framework" />
+        <pod id="AmazonAd"/>
     </platform>
     <platform name="android">
         <config-file target="res/xml/config.xml" parent="/*">
@@ -56,7 +50,7 @@
 
         <source-file src="src/android/AmazonMobileAdsPlugin.java"
             target-dir="src/com/blakgeek/cordova/plugin/amazonmobileads" />
-        <source-file src="src/android/amazon-ads-5.6.20.jar" target-dir="libs" />
+        <framework src="com.amazon.android:mobile-ads:5.+"/>
         <framework src="com.google.android.gms:play-services-ads:+" />
     </platform>
 </plugin>

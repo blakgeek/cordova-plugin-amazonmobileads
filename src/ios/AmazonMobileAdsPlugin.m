@@ -99,19 +99,22 @@
 
 
     CGSize bannerSize = AmazonAdSize_320x50;
+    CGRect frame =  {0,0, [UIScreen mainScreen].bounds.size.width, 50};
 
-//    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-//        bannerSize = AmazonAdSize_728x90;
-//    } else {
-//        bannerSize = AmazonAdSize_320x50;
-//    }
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        bannerSize = AmazonAdSize_728x90;
+    } else {
+        bannerSize = AmazonAdSize_320x50;
+    }
 
 //    extern const CGSize AmazonAdSize_320x50;
 //    extern const CGSize AmazonAdSize_300x250;
 //    extern const CGSize AmazonAdSize_728x90;
 //    extern const CGSize AmazonAdSize_1024x50;
 
-    self.amazonAdView = [AmazonAdView amazonAdViewWithAdSize:bannerSize];
+    self.amazonAdView = [[AmazonAdView alloc] initWithFrame: frame];
+    [self.amazonAdView setVerticalAlignment:AmazonAdVerticalAlignmentFitToContent];
+    [self.amazonAdView setHorizontalAlignment:AmazonAdHorizontalAlignmentCenter];
     self.amazonAdView.delegate = self;
     self.interstitial = [AmazonAdInterstitial amazonAdInterstitial];
     self.interstitial.delegate = self;
