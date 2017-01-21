@@ -1,0 +1,22 @@
+{
+  "name": "cordova-plugin-amazonmobileads",
+  "version": "1.1.1",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "revmob",
+    "ads"
+  ],
+  "description": "Add support for Amazon Mobile Ads to your Cordova and Phonegap based mobile apps.",
+  "author": "Carlos \"blakgeek\" Lawton",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blakgeek/cordova-plugin-amazonmobileads.git"
+  },
+  "bugs": {
+    "url": "https://github.com/blakgeek/cordova-plugin-amazonmobileads/issues"
+  },
+  "homepage": "https://github.com/blakgeek/cordova-plugin-amazonmobileads#readme"
+}

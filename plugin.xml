@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin id="cordova-plugin-amazonmobileads" version="2.0.0"
+<plugin id="cordova-plugin-amazonmobileads" version="1.2.0"
     xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
     <name>Amazon Mobile Ads Plugin</name>
     <description>Cordova plugin for Amazon Mobile Ads.</description>
