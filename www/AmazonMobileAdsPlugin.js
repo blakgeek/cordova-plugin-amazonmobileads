@@ -1,47 +1,49 @@
 var exec = require('cordova/exec');
 
 function AmazonMobileAds() {
-    
-    exec(dispatchEvent, null, "RevMobPlugin", "init");
+
+    var PLUGIN_NAME = "AmazonMobileAdsPlugin";
+
+    exec(dispatchEvent, null, PLUGIN_NAME, "init");
 
     this.init = this.setAppKey = function (key, successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'setAppKey', [key]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'setAppKey', [key]);
     };
 
     this.showBannerAd = function (showAtTop, claimSpace, successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'showBannerAd', [showAtTop === true, claimSpace !== false]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'showBannerAd', [showAtTop === true, claimSpace !== false]);
     };
 
     this.hideBannerAd = function (releaseSpace, successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'hideBannerAd', [releaseSpace !== false]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'hideBannerAd', [releaseSpace !== false]);
     };
 
     this.claimBannerAdSpace = function (atTop) {
-        exec(null, null, 'AmazonMobileAdsPlugin', 'claimBannerAdSpace', [atTop === true]);
+        exec(null, null, PLUGIN_NAME, 'claimBannerAdSpace', [atTop === true]);
     };
 
     this.releaseBannerAdSpace = function (atTop) {
-        exec(null, null, 'AmazonMobileAdsPlugin', 'releaseBannerAdSpace', []);
+        exec(null, null, PLUGIN_NAME, 'releaseBannerAdSpace', []);
     };
 
     this.showInterstitialAd = function (successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'showInterstitialAd', []);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'showInterstitialAd', []);
     };
 
     this.enableLogging = function (successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableLogging', [true]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'enableLogging', [true]);
     };
 
     this.disableLogging = function (successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableLogging', [false]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'enableLogging', [false]);
     };
 
     this.enableTestMode = function (successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableTestMode', [true]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'enableTestMode', [true]);
     };
 
     this.disableTestMode = function (successCallback, failureCallback) {
-        exec(successCallback, failureCallback, 'AmazonMobileAdsPlugin', 'enableTestMode', [false]);
+        exec(successCallback, failureCallback, PLUGIN_NAME, 'enableTestMode', [false]);
     };
     
     function dispatchEvent(e) {
